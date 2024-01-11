@@ -1,10 +1,10 @@
 import { render } from 'preact';
-
+import bootstrap from "bootstrap";
 import preactLogo from './assets/preact.svg';
 import './style.css';
 import { useEffect, useState } from 'preact/hooks';
 
-function currentPosition() {
+function CurrentPosition() {
 	const [position, setPosition] = useState<GeolocationPosition>();
 
 	useEffect(() => {
@@ -25,8 +25,13 @@ function currentPosition() {
 
 	return (
 		<div>
-			<h1>Latitude: {position.coords.latitude}</h1>
-			<h1>Longitude: {position.coords.longitude}</h1>
+			<h1>Current Position</h1>
+			{!position && <h1>Loading...</h1>}
+			{position && (
+				<h1>
+					{position.coords.latitude}, {position.coords.longitude}
+				</h1>
+			)}
 		</div>
 	);
 }
@@ -38,6 +43,7 @@ export function App() {
 				<img src={preactLogo} alt="Preact logo" height="160" width="160" />
 			</a>
 			<h1>Get Started building Vite-powered Preact Apps </h1>
+			<CurrentPosition />
 			<section>
 				<Resource
 					title="Learn Preact"
