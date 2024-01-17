@@ -1,43 +1,12 @@
 import { render } from 'preact';
-import bootstrap from "bootstrap";
-import preactLogo from './assets/preact.svg';
+import './assets/style.scss'
+import * as bootstrap from 'bootstrap'
 import './style.css';
 import { useEffect, useState } from 'preact/hooks';
 import { Container } from 'react-bootstrap';
 import PatternLock from './components/pattern';
 import LoginForm from './components/login';
 
-function CurrentPosition() {
-	const [position, setPosition] = useState<GeolocationPosition>();
-
-	useEffect(() => {
-		navigator.geolocation.getCurrentPosition(
-			(position) => {
-				setPosition(position);
-			},
-			(err) => {
-				console.log(err);
-			},
-			{
-				enableHighAccuracy: true,
-				timeout: 5000,
-				maximumAge: 0,
-			}
-		);
-	});
-
-	return (
-		<div>
-			<h1>Current Position</h1>
-			{!position && <h1>Loading...</h1>}
-			{position && (
-				<h1>
-					{position.coords.latitude}, {position.coords.longitude}
-				</h1>
-			)}
-		</div>
-	);
-}
 
 export function App() {
 	return (
