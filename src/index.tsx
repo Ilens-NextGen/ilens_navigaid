@@ -3,6 +3,9 @@ import bootstrap from "bootstrap";
 import preactLogo from './assets/preact.svg';
 import './style.css';
 import { useEffect, useState } from 'preact/hooks';
+import { Container } from 'react-bootstrap';
+import PatternLock from './components/pattern';
+import LoginForm from './components/login';
 
 function CurrentPosition() {
 	const [position, setPosition] = useState<GeolocationPosition>();
@@ -39,11 +42,9 @@ function CurrentPosition() {
 export function App() {
 	return (
 		<div>
-			<a href="https://preactjs.com" target="_blank">
-				<img src={preactLogo} alt="Preact logo" height="160" width="160" />
-			</a>
-			<h1>Get Started building Vite-powered Preact Apps </h1>
-			<CurrentPosition />
+			<Container>
+				<LoginForm />
+			</Container>
 			<section>
 				<Resource
 					title="Learn Preact"
