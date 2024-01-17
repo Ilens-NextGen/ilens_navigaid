@@ -1,76 +1,85 @@
 import { render } from 'preact';
-import bootstrap from "bootstrap";
-import preactLogo from './assets/preact.svg';
+import './assets/style.scss'
+import * as bootstrap from 'bootstrap'
 import './style.css';
 import { useEffect, useState } from 'preact/hooks';
+import { FaSearchLocation } from "react-icons/fa";
+import { Container, Form, InputGroup } from 'react-bootstrap';
+import axiosInstance from './core/axios';
+import { useLonLatStore } from './core/state';
 
 function CurrentPosition() {
-	const [position, setPosition] = useState<GeolocationPosition>();
+	const [lon, lat, radius, setLonLat, setRadius] = useLonLatStore((state) => (
+		[state.lon, state.lat, state.radius, state.setLonLat, state.setRadius])
+	);
 
 	useEffect(() => {
 		navigator.geolocation.getCurrentPosition(
 			(position) => {
-				setPosition(position);
+				setLonLat(position.coords.longitude, position.coords.latitude);
+				setRadius(position.coords.accuracy)
 			},
 			(err) => {
 				console.log(err);
 			},
 			{
-				enableHighAccuracy: true,
-				timeout: 5000,
-				maximumAge: 0,
+				enableHighAccuracy: false,
+				timeout: 10000,
+				maximumAge: 60000,
 			}
 		);
-	});
+	},[]);
 
 	return (
 		<div>
 			<h1>Current Position</h1>
-			{!position && <h1>Loading...</h1>}
-			{position && (
-				<h1>
-					{position.coords.latitude}, {position.coords.longitude}
-				</h1>
-			)}
+			<h2>{lon}, {lat}</h2>
+			<h2>Accurate to {radius} metres</h2>
 		</div>
 	);
+}
+
+
+function LocationSearch() {
+
+	const [lon, lat, rad] = useLonLatStore((state) => (
+		[state.lon, state.lat, state.radius]
+	));
+
+	function handleSearch(query: string) {
+		console.log('search: ', query);
+		axiosInstance.get(`LocalSearch/?q=${query}&ucmv=${lat},${lon},5000`).then((response) => {
+			console.log(response.data);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
+	return (
+		<InputGroup className="mb-3">
+			<InputGroup.Text id="basic-addon1">
+				<FaSearchLocation />
+			</InputGroup.Text>
+			<Form.Control onKeyUp={
+				(e) => {
+					if (e.key === 'Enter') {
+						handleSearch(e.currentTarget.value)
+					}
+				}
+			}
+				type="text"
+				placeholder="Search for a location"
+				aria-label="Search for a location"
+			/>
+		</InputGroup>
+	)
 }
 
 export function App() {
 	return (
-		<div>
-			<a href="https://preactjs.com" target="_blank">
-				<img src={preactLogo} alt="Preact logo" height="160" width="160" />
-			</a>
-			<h1>Get Started building Vite-powered Preact Apps </h1>
+		<Container>
+			<LocationSearch />
 			<CurrentPosition />
-			<section>
-				<Resource
-					title="Learn Preact"
-					description="If you're new to Preact, try the interactive tutorial to learn important concepts"
-					href="https://preactjs.com/tutorial"
-				/>
-				<Resource
-					title="Differences to React"
-					description="If you're coming from React, you may want to check out our docs to see where Preact differs"
-					href="https://preactjs.com/guide/v10/differences-to-react"
-				/>
-				<Resource
-					title="Learn Vite"
-					description="To learn more about Vite and how you can customize it to fit your needs, take a look at their excellent documentation"
-					href="https://vitejs.dev"
-				/>
-			</section>
-		</div>
-	);
-}
-
-function Resource(props) {
-	return (
-		<a href={props.href} target="_blank" class="resource">
-			<h2>{props.title}</h2>
-			<p>{props.description}</p>
-		</a>
+		</Container>
 	);
 }
 
